@@ -83,8 +83,6 @@ for s = 1, screen.count() do
             spacer,
             mytextclock,
             spacer,
-            kbdwidget,
-            spacer,
             cpuwidget,
             layout = awful.widget.layout.horizontal.rightleft
         },
