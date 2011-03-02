@@ -250,7 +250,13 @@ imtimer:start()
 
 -- Titlebars
 client.add_signal("manage", function (c, startup)
-    update_titlebar(c)
+    if update_titlebar(c) then
+        local g = c:geometry()
+        if g.x == 0 and g.y == 0 then
+            awful.placement.centered(c)
+        end
+    end
+
     c:add_signal("property::floating", update_titlebar)
     c:add_signal("property::maximized_vertical", update_titlebar)
     c:add_signal("property::maximized_horizontal", update_titlebar)
@@ -267,4 +273,6 @@ function update_titlebar(c)
     if not c.titlebar and should_have_tb then
         tbar.add(c, { modkey = modkey })
     end
+
+    return should_have_tb
 end
