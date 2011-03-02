@@ -142,7 +142,7 @@ globalkeys = awful.util.table.join(globalkeys,
     awful.key({"Control", "Mod1"}, "=", function()
         local c = awful.mouse.client_under_pointer()
         naughty.notify({
-            text = "class: " .. c.class .. "\nname: " .. c.name .. "\ninstance: " .. c.instance .. "\nrole: " .. tostring(c.role) .. "\nfloat: " .. tostring(awful.client.floating.get(c)),
+            text = "class: " .. c.class .. "\nname: " .. c.name .. "\ninstance: " .. c.instance .. "\nrole: " .. tostring(c.role) .. "\ntype: " .. c.type,
             timeout = 5, hover_timeout = 0.5,
             width = 500,
         })
@@ -167,7 +167,7 @@ conkeys = awful.util.table.join(clientkeys,
 )
 
 awful.rules.rules = awful.util.table.join(awful.rules.rules, {
-    { rule = { }, properties = { tag = tags[1]["main"], switchtotag = true, floating = true } },
+    { rule = { }, properties = { tag = tags[1]["main"], switchtotag = true, focus = true, floating = true } },
 
     { rule = { class = "URxvt" },
         properties = { tag = tags[1]["con"], keys = conkeys, switchtotag = true,
