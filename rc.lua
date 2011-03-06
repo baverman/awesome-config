@@ -142,7 +142,7 @@ globalkeys = awful.util.table.join(globalkeys,
     awful.key({"Control", "Mod1"}, "=", function()
         local c = awful.mouse.client_under_pointer()
         naughty.notify({
-            text = "class: " .. c.class .. "\nname: " .. c.name .. "\ninstance: " .. c.instance .. "\nrole: " .. tostring(c.role) .. "\ntype: " .. c.type,
+            text = "class: " .. c.class .. "\nname: " .. c.name .. "\ninstance: " .. c.instance .. "\nrole: " .. tostring(c.role) .. "\ntype: " .. c.type .. "\nfloat: " .. tostring(awful.client.floating.get(c)),
             timeout = 5, hover_timeout = 0.5,
             width = 500,
         })
@@ -166,6 +166,36 @@ conkeys = awful.util.table.join(clientkeys,
     awful.key({"Shift"}, "Right",function (c) awful.client.focus.byidx(1); client.focus:raise() end)
 )
 
+-- Handles tab key to fast switch between gimp image and tollboxes windows
+gimp_box_keys = awful.util.table.join(clientkeys,
+    awful.key({}, "Tab", function (c)
+        local boxes = get_clients(function(c) return c.role=="gimp-toolbox" or c.role=="gimp-dock" end)
+        local boxes_are_visible = true
+        for _, c in pairs(boxes) do
+            if not c.above then
+                boxes_are_visible = false
+                break
+            end
+        end
+
+        if boxes_are_visible then
+            for _, c in pairs(boxes) do
+                c.below = true
+            end
+
+            local c = get_client(match_client{role="gimp-image-window"})
+            if c then
+                client.focus = c
+            end
+        else
+            for _, c in pairs(boxes) do
+                c.above = true
+            end
+        end
+    end)
+)
+
+
 awful.rules.rules = awful.util.table.join(awful.rules.rules, {
     { rule = { }, properties = { tag = tags[1]["main"], switchtotag = true, focus = true, floating = true } },
 
@@ -174,6 +204,14 @@ awful.rules.rules = awful.util.table.join(awful.rules.rules, {
         size_hints_honor = false, border_width = 0, floating = false } },
 
     { rule = { class = "Gimp" },  properties = { tag = tags[1]["gimp"], switchtotag = true } },
+    { rule = { role = "gimp-image-window" }, properties = { size_hints_honor = false, keys = gimp_box_keys,
+        border_width = 0, floating = false, maximized_vertical = true, maximized_horizontal = true } },
+    { rule = { role = "gimp-toolbox" },  properties = { size_hints_honor = false,
+        floating = false, skip_taskbar = true, focus = false, keys = gimp_box_keys,
+        geometry = {x=0, y=19, height=581, width=400}, below = true } },
+    { rule = { role = "gimp-dock" },  properties = { size_hints_honor = false,
+        floating = false, skip_taskbar = true, focus = false, keys = gimp_box_keys,
+        geometry = {x=624, y=19, height=581, width=400}, below = true } },
 
     { rule = { class = "Opera", instance = "opera" }, properties = { border_width = 0,
         maximized_vertical = true, maximized_horizontal = true, floating = false } },

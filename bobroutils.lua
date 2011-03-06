@@ -6,6 +6,16 @@ function get_client(matcher)
     end
 end
 
+function get_clients(matcher)
+    result = {}
+    for _, c in pairs(client.get()) do
+        if matcher(c) then
+            table.insert(result, c)
+        end
+    end
+    return result
+end
+
 function spawn_or_raise(cmd, matcher)
     local c = get_client(matcher)
     if c then
@@ -19,9 +29,14 @@ end
 
 function match_client(args)
     return function(c)
+        local ismatched = true
         if args.instance then
-            return c.instance == args.instance
+            ismatched = ismatched and c.instance == args.instance
         end
+        if args.role then
+            ismatched = ismatched and c.role == args.role
+        end
+        return ismatched
     end
 end
 
