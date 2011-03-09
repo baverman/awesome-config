@@ -26,7 +26,7 @@ for s = 1, screen.count() do
 
     screen[s]:tags(tt)
 
-    awful.layout.set(awful.layout.suit.float, tags[s]["main"])
+    awful.layout.set(awful.layout.suit.max, tags[s]["main"])
     awful.layout.set(awful.layout.suit.max, tags[s]["con"])
     awful.layout.set(awful.layout.suit.float, tags[s]["gimp"])
 
@@ -214,11 +214,9 @@ awful.rules.rules = awful.util.table.join(awful.rules.rules, {
         floating = false, skip_taskbar = true, focus = false, keys = gimp_box_keys,
         geometry = {x=624, y=19, height=581, width=400}, below = true } },
 
-    { rule = { class = "Opera", instance = "opera" }, properties = { border_width = 0,
-        maximized_vertical = true, maximized_horizontal = true, floating = false } },
+    { rule = { class = "Opera", instance = "opera" }, properties = { border_width = 0, floating = false } },
 
-    { rule = { class = "Snaked", role = "Editor" }, properties = { border_width = 0,
-        maximized_vertical = true, maximized_horizontal = true, floating = false } },
+    { rule = { class = "Snaked", role = "Editor" }, properties = { border_width = 0, floating = false } },
 
     { rule = { modal = true }, properties = { skip_taskbar = true } },
 })
