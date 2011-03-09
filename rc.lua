@@ -204,6 +204,7 @@ awful.rules.rules = awful.util.table.join(awful.rules.rules, {
         size_hints_honor = false, border_width = 0, floating = false } },
 
     { rule = { class = "Gimp" },  properties = { tag = tags[1]["gimp"], switchtotag = true } },
+    { rule = { instance = "gimp", type = "dialog" },  properties = { above = true } },
     { rule = { role = "gimp-image-window" }, properties = { size_hints_honor = false, keys = gimp_box_keys,
         border_width = 0, floating = false, maximized_vertical = true, maximized_horizontal = true } },
     { rule = { role = "gimp-toolbox" },  properties = { size_hints_honor = false,
