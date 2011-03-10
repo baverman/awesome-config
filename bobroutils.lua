@@ -85,7 +85,7 @@ end
 
 function remove_key(keys, mods, key)
     for i, k in pairs(keys) do
-        if k.key == key and table.concat(k.modifiers, ',') == table.concat(mods, ',') then
+        if awful.key.match(k, mods, key) then
             table.remove(keys, i)
         end
     end

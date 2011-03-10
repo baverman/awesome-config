@@ -197,7 +197,8 @@ gimp_box_keys = awful.util.table.join(clientkeys,
 
 
 awful.rules.rules = awful.util.table.join(awful.rules.rules, {
-    { rule = { }, properties = { tag = tags[1]["main"], switchtotag = true, focus = true, floating = true } },
+    { rule = { }, properties = { tag = tags[1]["main"], switchtotag = true, focus = true,
+        floating = true } },
 
     { rule = { class = "URxvt" },
         properties = { tag = tags[1]["con"], keys = conkeys, switchtotag = true,
