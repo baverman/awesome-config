@@ -90,3 +90,19 @@ function remove_key(keys, mods, key)
         end
     end
 end
+
+-- Give focus on tag selection change.
+-- @param obj An object that should have a .screen property.
+function check_focus(obj)
+    if not client.focus or not client.focus:isvisible() then
+        local c = awful.client.focus.history.get(1, 0)
+        if c then client.focus = c end
+    end
+end
+
+client.add_signal("unmanage", check_focus)
+client.add_signal("new", function(c)
+    c:add_signal("untagged", check_focus)
+    c:add_signal("property::hidden", check_focus)
+    c:add_signal("property::minimized", check_focus)
+end)

@@ -94,8 +94,13 @@ end
 -- }}}
 
 remove_key(globalkeys, { modkey }, 'Tab')
+remove_key(globalkeys, { modkey }, 'Left')
+remove_key(globalkeys, { modkey }, 'Right')
 
 globalkeys = awful.util.table.join(globalkeys,
+    awful.key({ modkey }, "Left",   function() awful.tag.viewprev(); check_focus() end ),
+    awful.key({ modkey }, "Right",  function() awful.tag.viewnext(); check_focus() end ),
+
     awful.key({ modkey }, "F1", function () mypromptbox[mouse.screen]:run() end),
     awful.key({ modkey }, "[", function() awful.util.spawn("mpc volume -2") end),
     awful.key({ modkey }, "]", function() awful.util.spawn("mpc volume +2") end),
@@ -129,12 +134,15 @@ globalkeys = awful.util.table.join(globalkeys,
                     awful.util.spawn(terminal)
                 else
                     awful.tag.viewonly(tags[1]["con"])
+                    check_focus(nil)
                 end
             else
                 if prev_selected_tag then
                     awful.tag.viewonly(prev_selected_tag)
+                    check_focus(nil)
                 else
                     awful.tag.viewonly(tags[1]["main"])
+                    check_focus(nil)
                 end
             end
         end
@@ -299,9 +307,9 @@ client.add_signal("manage", function (c, startup)
     c:add_signal("property::maximized_horizontal", update_titlebar)
 end)
 
-client.add_signal("focus", function(c)
-    io.stderr:write('Focused ' .. tostring(c.name) .. '\n' .. debug.traceback() .. '\n\n')
-end)
+--client.add_signal("focus", function(c)
+--    io.stderr:write('Focused ' .. tostring(c.name) .. '\n' .. debug.traceback() .. '\n\n')
+--end)
 
 function update_titlebar(c)
     local should_have_tb = awful.client.floating.get(c)
