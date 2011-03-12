@@ -3,7 +3,9 @@ require("vicious")
 require("bobroutils")
 require("tbar")
 require("debug")
+require("rsi")
 -- require("data_dump")
+
 
 terminal = "urxvtc"
 editor = os.getenv("EDITOR") or "vim"
@@ -98,6 +100,7 @@ remove_key(globalkeys, { modkey }, 'Left')
 remove_key(globalkeys, { modkey }, 'Right')
 
 globalkeys = awful.util.table.join(globalkeys,
+    awful.key({ modkey }, "b",   rsi.start_rest ),
     awful.key({ modkey }, "Left",   function() awful.tag.viewprev(); check_focus() end ),
     awful.key({ modkey }, "Right",  function() awful.tag.viewnext(); check_focus() end ),
 
@@ -325,3 +328,5 @@ function update_titlebar(c)
 
     return should_have_tb
 end
+
+rsi.run()
