@@ -2,6 +2,7 @@ require("origrc")  -- it's a symlink to /etc/xdg/awesome/rc.lua
 require("vicious")
 require("bobroutils")
 require("tbar")
+require("debug")
 -- require("data_dump")
 
 terminal = "urxvtc"
@@ -197,8 +198,7 @@ gimp_box_keys = awful.util.table.join(clientkeys,
 
 
 awful.rules.rules = awful.util.table.join(awful.rules.rules, {
-    { rule = { }, properties = { tag = tags[1]["main"], switchtotag = true, focus = true,
-        floating = true } },
+    { rule = { }, properties = { tag = tags[1]["main"], switchtotag = true, floating = true } },
 
     { rule = { class = "URxvt" },
         properties = { tag = tags[1]["con"], keys = conkeys, switchtotag = true,
@@ -289,8 +289,7 @@ imtimer:start()
 -- Titlebars
 client.add_signal("manage", function (c, startup)
     if update_titlebar(c) then
-        local g = c:geometry()
-        if g.x == 0 and g.y == 0 then
+        if not c.size_hints.user_position and not c.size_hints.program_position then
             awful.placement.centered(c)
         end
     end
@@ -298,6 +297,10 @@ client.add_signal("manage", function (c, startup)
     c:add_signal("property::floating", update_titlebar)
     c:add_signal("property::maximized_vertical", update_titlebar)
     c:add_signal("property::maximized_horizontal", update_titlebar)
+end)
+
+client.add_signal("focus", function(c)
+    io.stderr:write('Focused ' .. tostring(c.name) .. '\n' .. debug.traceback() .. '\n\n')
 end)
 
 function update_titlebar(c)
