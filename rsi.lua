@@ -28,7 +28,7 @@ local function check()
         start_rest()
     end
 
-    if not working and os.time - last_work > rest_time*60 then
+    if not working and os.time() - last_work > rest_time*60 then
         stop_rest()
     end
 end
