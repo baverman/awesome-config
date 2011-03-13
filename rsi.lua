@@ -3,6 +3,7 @@ local keygrabber = keygrabber
 local mousegrabber = mousegrabber
 local timer = timer
 local os = os
+local io = io
 local ipairs = ipairs
 local table = table
 local naughty = require('naughty')
@@ -13,25 +14,21 @@ local password = {'q', 'u', 'i', 't'}
 local work_time = 55
 local rest_time = 5
 local postpone_time = 5
-local activity_time = 15
+local activity_time = 10
 
 local last_rest
 local last_work
-local last_activity = 0
 
 local strokes
 local check_timer
+local activity_timer
 local working = true
 
 local banner
 
 local function check()
     if working and os.time() - last_rest > work_time*60 then
-        if not any_activity() then
-            last_rest = os.time()
-        else
-            start_rest()
-        end
+        start_rest()
     end
 
     if not working and os.time() - last_work > rest_time*60 then
@@ -101,15 +98,17 @@ function stop_rest(postpone)
     mousegrabber.stop()
 end
 
-function any_activity()
-    return os.time() - last_activity < activity_time*60
+local function any_activity()
+    local f = io.popen('xprintidle')
+    local idle = tonumber(f:read())
+    f:close()
+    return idle < activity_time*60*1000
 end
 
-function activity()
+local function check_activity()
     if not any_activity() then
         last_rest = os.time()
     end
-    last_activity = os.time()
 end
 
 function run(args)
@@ -121,9 +120,12 @@ function run(args)
     activity_time = args.activity or activity_time
 
     last_rest = os.time()
-    last_activity = os.time()
 
     check_timer = timer{timeout = 10}
     check_timer:add_signal('timeout', check)
     check_timer:start()
+
+    activity_timer = timer{timeout = 60}
+    activity_timer:add_signal('timeout', check_activity)
+    activity_timer:start()
 end

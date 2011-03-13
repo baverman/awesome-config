@@ -309,7 +309,6 @@ client.add_signal("manage", function (c, startup)
 end)
 
 client.add_signal("focus", function(c)
-    rsi.activity()
     update_titlebar(c)
     --io.stderr:write('Focused ' .. tostring(c.name) .. '\n' .. debug.traceback() .. '\n\n')
 end)
