@@ -310,9 +310,10 @@ client.add_signal("manage", function (c, startup)
     c:add_signal("property::maximized_horizontal", update_titlebar)
 end)
 
---client.add_signal("focus", function(c)
---    io.stderr:write('Focused ' .. tostring(c.name) .. '\n' .. debug.traceback() .. '\n\n')
---end)
+client.add_signal("focus", function(c)
+    rsi.activity()
+    --io.stderr:write('Focused ' .. tostring(c.name) .. '\n' .. debug.traceback() .. '\n\n')
+end)
 
 function update_titlebar(c)
     local should_have_tb = awful.client.floating.get(c)

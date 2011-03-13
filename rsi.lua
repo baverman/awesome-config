@@ -13,9 +13,11 @@ local password = {'q', 'u', 'i', 't'}
 local work_time = 55
 local rest_time = 5
 local postpone_time = 5
+local activity_time = 15
 
 local last_rest
 local last_work
+local last_activity = 0
 
 local strokes
 local check_timer
@@ -25,7 +27,11 @@ local banner
 
 local function check()
     if working and os.time() - last_rest > work_time*60 then
-        start_rest()
+        if not any_activity() then
+            last_rest = os.time()
+        else
+            start_rest()
+        end
     end
 
     if not working and os.time() - last_work > rest_time*60 then
@@ -95,13 +101,27 @@ function stop_rest(postpone)
     mousegrabber.stop()
 end
 
+function any_activity()
+    return os.time() - last_activity < activity_time*60
+end
+
+function activity()
+    if not any_activity() then
+        last_rest = os.time()
+    end
+    last_activity = os.time()
+end
+
 function run(args)
     if not args then args = {} end
 
-    work_time = args.work or 55
-    rest_time = args.rest or 5
+    work_time = args.work or work_time
+    rest_time = args.rest or rest_time
+    postpone_time = args.postpone or postpone_time
+    activity_time = args.activity or activity_time
 
     last_rest = os.time()
+    last_activity = os.time()
 
     check_timer = timer{timeout = 10}
     check_timer:add_signal('timeout', check)
