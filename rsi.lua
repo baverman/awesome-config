@@ -5,6 +5,7 @@ local timer = timer
 local os = os
 local io = io
 local ipairs = ipairs
+local tonumber = tonumber
 local table = table
 local naughty = require('naughty')
 
