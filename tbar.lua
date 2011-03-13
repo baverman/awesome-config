@@ -80,6 +80,8 @@ function add(c, args)
         title.text = "<span font_desc='" .. data[c].font .. "'> " ..
                      util.escape(c.name) .. " </span>"
     end
+    layout.margins[title] = { top = 1 }
+
 
     -- Redirect relevant events to the client the titlebar belongs to
     local bts = util.table.join(

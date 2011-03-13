@@ -1,20 +1,28 @@
-require("origrc")  -- it's a symlink to /etc/xdg/awesome/rc.lua
+require("awful")
+require("awful.rules")
+require("beautiful")
+require("naughty")
+
 require("vicious")
 require("bobroutils")
 require("tbar")
-require("debug")
 require("rsi")
--- require("data_dump")
+--require("debug")
 
+-- {{{ Variable definitions
+-- Themes define colours, icons, and wallpapers
+beautiful.init("/home/bobrov/.config/awesome/theme/theme.lua")
 
+-- This is used later as the default terminal and editor to run.
 terminal = "urxvtc"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
+modkey = "Mod4"
+
 naughty.config.margin           = 10
 naughty.config.height           = 30
 naughty.config.width            = 300
-
 
 -- {{{ Tags
 -- Define tags table.
@@ -37,11 +45,55 @@ for s = 1, screen.count() do
 end
 -- }}}
 
-mytasklist.buttons = awful.util.table.join(mytasklist.buttons,
-    awful.button({ }, 2, function (c) c:kill() end) )
+-- {{{ Menu
+-- Create a laucher widget and a main menu
+myawesomemenu = {
+   { "manual", terminal .. " -e man awesome" },
+   { "edit config", editor_cmd .. " " .. awful.util.getdir("config") .. "/rc.lua" },
+   { "restart", awesome.restart },
+   { "quit", awesome.quit }
+}
 
-spacer = widget({ type = "textbox" })
-spacer.text = " "
+mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
+                                    { "open terminal", terminal }
+                                  }
+                        })
+
+mylauncher = awful.widget.launcher({ image = image(beautiful.awesome_icon),
+                                     menu = mymainmenu })
+-- }}}
+
+-- {{{ Wibox
+-- Create a textclock widget
+mytextclock = awful.widget.textclock({align = "right"}, "%H:%M", 10)
+awful.widget.layout.margins[mytextclock] = { right = 1 }
+
+-- Create a systray
+mysystray = widget({ type = "systray" })
+awful.widget.layout.margins[mysystray] = { left = 4 }
+
+-- Create a wibox for each screen and add it
+mywibox = {}
+mypromptbox = {}
+mylayoutbox = {}
+
+mytaglist = {}
+mytaglist.buttons = awful.util.table.join(
+    awful.button({ }, 1, awful.tag.viewonly),
+    awful.button({ modkey }, 1, awful.client.movetotag)
+)
+
+mytasklist = {}
+mytasklist.buttons = awful.util.table.join(
+    awful.button({ }, 2, function (c) c:kill() end),
+    awful.button({ }, 1, function (c)
+        if not c:isvisible() then
+          awful.tag.viewonly(c:tags()[1])
+        end
+        client.focus = c
+        c:raise()
+    end)
+)
 
 cpuwidget = awful.widget.graph()
 cpuwidget:set_width(40)
@@ -50,19 +102,12 @@ cpuwidget:set_background_color(beautiful.bg_normal)
 cpuwidget:set_color('#FF5656')
 cpuwidget:set_gradient_colors({ '#FF5656', '#88A175', '#AECF96' })
 cpuwidget.layout = awful.widget.layout.horizontal.rightleft
-awful.widget.layout.margins[cpuwidget.widget] = { top = 1, left = 3 }
+awful.widget.layout.margins[cpuwidget.widget] = { top = 1, left = 3, right = 5 }
 vicious.register(cpuwidget, vicious.widgets.cpu, '$1', 1)
 
-mytextclock = awful.widget.textclock({}, "%H:%M", 10)
-
-awful.widget.layout.margins[mysystray] = { top = 1, bottom = 2 }
 
 for s = 1, screen.count() do
-    -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
-    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
-    -- We need one layoutbox per screen.
-    -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
 
     -- Create a tasklist widget
@@ -83,9 +128,7 @@ for s = 1, screen.count() do
         },
         {
             s == 1 and mysystray or nil,
-            spacer,
             mytextclock,
-            spacer,
             cpuwidget,
             layout = awful.widget.layout.horizontal.rightleft
         },
@@ -95,16 +138,33 @@ for s = 1, screen.count() do
 end
 -- }}}
 
-remove_key(globalkeys, { modkey }, 'Tab')
-remove_key(globalkeys, { modkey }, 'Left')
-remove_key(globalkeys, { modkey }, 'Right')
 
-globalkeys = awful.util.table.join(globalkeys,
+-- {{{ Key bindings
+globalkeys = awful.util.table.join(
+    awful.key({ modkey,           }, "j",
+        function ()
+            awful.client.focus.byidx( 1)
+            if client.focus then client.focus:raise() end
+        end),
+    awful.key({ modkey,           }, "k",
+        function ()
+            awful.client.focus.byidx(-1)
+            if client.focus then client.focus:raise() end
+        end),
+
+    awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
+
+    awful.key({ modkey, "Control" }, "r", awesome.restart),
+    awful.key({ modkey, "Shift"   }, "q", awesome.quit),
+
+    -- Prompt
+    awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
+
+    -- My Keys
     awful.key({ modkey }, "b",   rsi.start_rest ),
     awful.key({ modkey }, "Left",   function() awful.tag.viewprev(); check_focus() end ),
     awful.key({ modkey }, "Right",  function() awful.tag.viewnext(); check_focus() end ),
 
-    awful.key({ modkey }, "F1", function () mypromptbox[mouse.screen]:run() end),
     awful.key({ modkey }, "[", function() awful.util.spawn("mpc volume -2") end),
     awful.key({ modkey }, "]", function() awful.util.spawn("mpc volume +2") end),
 
@@ -171,7 +231,20 @@ globalkeys = awful.util.table.join(globalkeys,
     end)
 )
 
+clientkeys = awful.util.table.join(
+    awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
+    awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
+    awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end)
+)
+
+clientbuttons = awful.util.table.join(
+    awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
+    awful.button({ modkey }, 1, awful.mouse.client.move),
+    awful.button({ modkey }, 3, awful.mouse.client.resize))
+
+-- Set keys
 root.keys(globalkeys)
+-- }}}
 
 conkeys = awful.util.table.join(clientkeys,
     awful.key({"Shift"}, "Left", function (c) awful.client.focus.byidx(-1); client.focus:raise() end),
@@ -207,8 +280,16 @@ gimp_box_keys = awful.util.table.join(clientkeys,
     end)
 )
 
+-- {{{ Rules
+awful.rules.rules = {
+    -- All clients will match this rule.
+    { rule = { },
+      properties = { border_width = beautiful.border_width,
+                     border_color = beautiful.border_normal,
+                     focus = true,
+                     keys = clientkeys,
+                     buttons = clientbuttons } },
 
-awful.rules.rules = awful.util.table.join(awful.rules.rules, {
     { rule = { }, properties = { tag = tags[1]["main"], switchtotag = true, floating = true } },
 
     { rule = { class = "URxvt" },
@@ -230,9 +311,51 @@ awful.rules.rules = awful.util.table.join(awful.rules.rules, {
 
     { rule = { class = "Snaked", role = "Editor" }, properties = { border_width = 0, floating = false } },
 
-    { rule = { modal = true }, properties = { skip_taskbar = true } },
-})
+    { rule = { modal = true }, properties = { skip_taskbar = true, floating = true } },
+}
+-- }}}
 
+-- {{{ Signals
+-- Signal function to execute when a new client appears.
+client.add_signal("manage", function (c, startup)
+    if update_titlebar(c) then
+        if not c.size_hints.user_position and not c.size_hints.program_position then
+            awful.placement.centered(c)
+        end
+    end
+
+    c:add_signal("property::floating", update_titlebar)
+end)
+
+client.add_signal("focus", function(c)
+    c.border_color = beautiful.border_focus
+    update_titlebar(c)
+    --io.stderr:write('Focused ' .. tostring(c.name) .. '\n' .. debug.traceback() .. '\n\n')
+end)
+
+client.add_signal("unfocus", function(c)
+    c.border_color = beautiful.border_normal
+    update_titlebar(c)
+end)
+-- }}}
+
+function update_titlebar(c)
+    local should_have_tb = awful.client.floating.get(c)
+
+    if c.titlebar and not should_have_tb then
+        tbar.remove(c)
+    end
+
+    if not c.titlebar and should_have_tb then
+        tbar.add(c, { modkey = modkey })
+    end
+
+    if not c.modal then
+        c.skip_taskbar = should_have_tb and client.focus == c
+    end
+
+    return should_have_tb
+end
 
 -- Clock stuff
 local calendar = nil
@@ -256,7 +379,8 @@ function add_calendar(inc_offset)
     local cal = awful.util.pread("cal -m " .. datespec)
     cal = string.gsub(cal, "^%s*(.-)%s*$", "%1")
     calendar = naughty.notify({
-        text = string.format('<span font_desc="%s">%s</span>', "monospace", os.date("%a, %d %B %Y") .. "\n" .. cal),
+        text = string.format('<span font_desc="%s">%s</span>',
+            "monospace", os.date("%a, %d %B %Y") .. "\n" .. cal),
         timeout = 0, hover_timeout = 0.5,
         width = 170,
     })
@@ -295,44 +419,5 @@ imtimer:add_signal("timeout", function()
     end
 end)
 imtimer:start()
-
-
--- Titlebars
-client.add_signal("manage", function (c, startup)
-    if update_titlebar(c) then
-        if not c.size_hints.user_position and not c.size_hints.program_position then
-            awful.placement.centered(c)
-        end
-    end
-
-    c:add_signal("property::floating", update_titlebar)
-end)
-
-client.add_signal("focus", function(c)
-    update_titlebar(c)
-    --io.stderr:write('Focused ' .. tostring(c.name) .. '\n' .. debug.traceback() .. '\n\n')
-end)
-
-client.add_signal("unfocus", function(c)
-    update_titlebar(c)
-end)
-
-function update_titlebar(c)
-    local should_have_tb = awful.client.floating.get(c)
-
-    if c.titlebar and not should_have_tb then
-        tbar.remove(c)
-    end
-
-    if not c.titlebar and should_have_tb then
-        tbar.add(c, { modkey = modkey })
-    end
-
-    if not c.modal then
-        c.skip_taskbar = should_have_tb and client.focus == c
-    end
-
-    return should_have_tb
-end
 
 rsi.run()
