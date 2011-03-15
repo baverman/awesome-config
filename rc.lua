@@ -2,6 +2,7 @@ require("awful")
 require("awful.rules")
 require("beautiful")
 require("naughty")
+require("keygrabber")
 
 require("vicious")
 require("bobroutils")
@@ -187,7 +188,42 @@ globalkeys = awful.util.table.join(
     awful.key({"Control", "Mod1"}, "x",  function() awful.util.spawn(terminal) end),
     awful.key({"Control", "Mod1"}, "\\",  function() root.cursor("left_ptr") end),
 
-    awful.key({ modkey }, "Tab", function () focus_without_modal_transients(1) end),
+    awful.key({ modkey }, "Tab", function ()
+        local hist = focus_history_without_modal_transients(1)
+
+        if #hist < 2 then
+            return
+        end
+
+        client.focus = hist[2]
+        hist[2]:raise()
+        local lastidx = 2
+        local first_client = hist[1]
+
+        keygrabber.run(function(mod, key, event)
+            if key == 'Super_L' and event == 'release' then
+                if client.focus ~= first_client then
+                    awful.client.focus.history.add(first_client)
+                    if client.focus.modal and client.focus.transient_for then
+                        awful.client.focus.history.add(client.focus.transient_for)
+                    end
+                    awful.client.focus.history.add(client.focus)
+                end
+                return false
+            end
+
+            if key == 'Tab' and event == 'press' then
+                lastidx = lastidx + 1
+                if lastidx > #hist then
+                    lastidx = 1
+                end
+                client.focus = hist[lastidx]
+                hist[lastidx]:raise()
+            end
+
+            return true
+        end)
+    end),
 
     awful.key({"Control", "Mod1"}, "c",
         function()
@@ -330,7 +366,6 @@ end)
 client.add_signal("focus", function(c)
     c.border_color = beautiful.border_focus
     update_titlebar(c)
-    --io.stderr:write('Focused ' .. tostring(c.name) .. '\n' .. debug.traceback() .. '\n\n')
 end)
 
 client.add_signal("unfocus", function(c)

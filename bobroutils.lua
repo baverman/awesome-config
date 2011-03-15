@@ -40,10 +40,11 @@ function match_client(args)
     end
 end
 
-function log(str)
-    f = io.open("/tmp/awesome.log", "a+")
-    f:write(str, "\n")
-    f:close()
+function log(...)
+    for k, v in ipairs({...}) do
+        io.stderr:write(tostring(v) .. ' ')
+    end
+    io.stderr:write('\n')
 end
 
 function rfile(filename)
@@ -63,24 +64,23 @@ function get_modal_transients()
     return result
 end
 
-function focus_without_modal_transients(idx)
+function focus_history_without_modal_transients(screen)
     local modal_transients = get_modal_transients()
+    local result = {}
 
-    local i = idx
-    local c = nil
-    repeat
-        c = awful.client.focus.history.get(1, idx)
-        if not modal_transients[c] then break end
-        i = i + idx
-    until c == nil
-
-    if c then
-        client.focus = c
-        c:raise()
-        if c.modal then
-            awful.client.focus.history.add(c.transient_for)
+    local vc = awful.client.visible(screen)
+    for k, c in ipairs(awful.client.data.focus) do
+        if c.screen == screen then
+            for j, vcc in ipairs(vc) do
+                if vcc == c and not modal_transients[c] then
+                    table.insert(result, c)
+                    break
+                end
+            end
         end
     end
+
+    return result
 end
 
 function remove_key(keys, mods, key)
