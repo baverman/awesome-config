@@ -69,7 +69,7 @@ function focus_without_modal_transients(idx)
     local i = idx
     local c = nil
     repeat
-        c = awful.client.next(i)
+        c = awful.client.focus.history.get(1, idx)
         if not modal_transients[c] then break end
         i = i + idx
     until c == nil

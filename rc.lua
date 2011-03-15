@@ -187,7 +187,7 @@ globalkeys = awful.util.table.join(
     awful.key({"Control", "Mod1"}, "x",  function() awful.util.spawn(terminal) end),
     awful.key({"Control", "Mod1"}, "\\",  function() root.cursor("left_ptr") end),
 
-    awful.key({ modkey }, "Tab", function () focus_without_modal_transients(-1) end),
+    awful.key({ modkey }, "Tab", function () focus_without_modal_transients(1) end),
 
     awful.key({"Control", "Mod1"}, "c",
         function()
