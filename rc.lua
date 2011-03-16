@@ -344,6 +344,7 @@ awful.rules.rules = {
         geometry = {x=624, y=19, height=581, width=400}, below = true } },
 
     { rule = { class = "Opera", instance = "opera" }, properties = { border_width = 0, floating = false } },
+    { rule = { class = "Namoroka", role = "browser" }, properties = { border_width = 0, floating = false } },
 
     { rule = { class = "Snaked", role = "Editor" }, properties = { border_width = 0, floating = false } },
 
