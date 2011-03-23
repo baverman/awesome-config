@@ -250,7 +250,7 @@ globalkeys = awful.util.table.join(
     awful.key({"Control", "Mod1"}, "=", function()
         local c = awful.mouse.client_under_pointer()
         naughty.notify({
-            text = "class: " .. c.class .. "\nname: " .. c.name .. "\ninstance: " .. c.instance .. "\nrole: " .. tostring(c.role) .. "\ntype: " .. c.type .. "\nfloat: " .. tostring(awful.client.floating.get(c)),
+            text = "class: " .. c.class .. "\nname: " .. c.name .. "\ninstance: " .. c.instance .. "\nrole: " .. tostring(c.role) .. "\ntype: " .. c.type .. "\nfloat: " .. tostring(isfloating(c)),
             timeout = 5, hover_timeout = 0.5,
             width = 500,
         })
@@ -269,7 +269,7 @@ globalkeys = awful.util.table.join(
 
 clientkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
-    awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
+    awful.key({ modkey, "Control" }, "space",  floating_toggle                                  ),
     awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end)
 )
 
@@ -376,7 +376,7 @@ end)
 -- }}}
 
 function update_titlebar(c)
-    local should_have_tb = awful.client.floating.get(c)
+    local should_have_tb = isfloating(c)
 
     if c.titlebar and not should_have_tb then
         tbar.remove(c)

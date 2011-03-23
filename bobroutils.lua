@@ -106,3 +106,35 @@ client.add_signal("new", function(c)
     c:add_signal("property::hidden", check_focus)
     c:add_signal("property::minimized", check_focus)
 end)
+
+function floating_set(c, s)
+    if c then
+        awful.client.property.set(c, "floating", s)
+        local screen = c.screen
+        if s == true then
+            c:geometry(awful.client.property.get(c, "floating_geometry"))
+        end
+        c.screen = screen
+
+        if s then
+            if c.maximized_horizontal then
+                c.maximized_horizontal = false
+            end
+            if c.maximized_vertical then
+                c.maximized_vertical = false
+            end
+        end
+    end
+end
+
+function isfloating(c)
+    if awful.client.property.get(c, "floating") then
+        return true
+    else
+        return false
+    end
+end
+
+function floating_toggle(c)
+    floating_set(c, not isfloating(c))
+end
