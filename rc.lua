@@ -345,6 +345,7 @@ awful.rules.rules = {
 
     { rule = { class = "Opera", instance = "opera" }, properties = { border_width = 0, floating = false } },
     { rule = { class = "Namoroka", role = "browser" }, properties = { border_width = 0, floating = false } },
+    { rule = { class = "Firefox", role = "browser" }, properties = { border_width = 0, floating = false } },
 
     { rule = { class = "Snaked", role = "Editor" }, properties = { border_width = 0, floating = false } },
 
