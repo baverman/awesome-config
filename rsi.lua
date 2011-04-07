@@ -19,6 +19,7 @@ local activity_time = 10
 
 local last_rest
 local last_work
+local last_check
 
 local strokes
 local check_timer
@@ -28,11 +29,13 @@ local working = true
 local banner
 
 local function check()
-    if working and os.time() - last_rest > work_time*60 then
+    local now = os.time()
+
+    if working and now - last_check < rest_time*60 and now - last_rest > work_time*60 then
         start_rest()
     end
 
-    if not working and os.time() - last_work > rest_time*60 then
+    if not working and now - last_work > rest_time*60 then
         stop_rest()
     end
 end
@@ -76,8 +79,7 @@ function start_rest()
 
     banner = naughty.notify({
         text = 'Take break',
-        timeout = rest_time*60,
-        width = 100,
+        timeout = rest_time*70,
     })
 
 end
@@ -107,9 +109,11 @@ local function any_activity()
 end
 
 local function check_activity()
-    if not any_activity() then
-        last_rest = os.time()
+    local now = os.time()
+    if not any_activity() or now - last_check > rest_time*60 then
+        last_rest = now
     end
+    last_check = now
 end
 
 function run(args)
@@ -121,6 +125,7 @@ function run(args)
     activity_time = args.activity or activity_time
 
     last_rest = os.time()
+    last_check = os.time()
 
     check_timer = timer{timeout = 10}
     check_timer:add_signal('timeout', check)
