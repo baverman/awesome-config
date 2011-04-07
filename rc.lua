@@ -40,7 +40,7 @@ for s = 1, screen.count() do
 
     awful.layout.set(awful.layout.suit.max, tags[s]["main"])
     awful.layout.set(awful.layout.suit.max, tags[s]["con"])
-    awful.layout.set(awful.layout.suit.float, tags[s]["gimp"])
+    awful.layout.set(awful.layout.suit.max, tags[s]["gimp"])
 
     tags[s]["main"].selected = true
 end
@@ -168,6 +168,7 @@ globalkeys = awful.util.table.join(
 
     awful.key({ modkey }, "[", function() awful.util.spawn("mpc volume -2") end),
     awful.key({ modkey }, "]", function() awful.util.spawn("mpc volume +2") end),
+    awful.key({ modkey }, "p", function() awful.util.spawn("mpc toggle") end),
 
     awful.key({}, "XF86MonBrightnessUp", function() awful.util.spawn("sudo backlight up") end),
     awful.key({}, "XF86MonBrightnessDown", function() awful.util.spawn("sudo backlight down") end),
@@ -178,8 +179,8 @@ globalkeys = awful.util.table.join(
     awful.key({"Control", "Mod1"}, "p",  function() spawn_or_raise("urxvtc -name ncmpcpp -e ncmpcpp",
         match_client{instance='ncmpcpp'}) end),
 
-    awful.key({modkey}, "i",  function() spawn_or_raise("urxvtc -name mcabber -e mcabber",
-        match_client{instance='mcabber'}) end),
+    awful.key({modkey}, "i",  function() spawn_or_raise("urxvtc -name irssi -e irssi",
+        match_client{instance='irssi'}) end),
 
     awful.key({"Control", "Mod1"}, "m",  function() spawn_or_raise("urxvtc -name amixer -e alsamixer",
         match_client{instance='amixer'}) end),
@@ -332,16 +333,16 @@ awful.rules.rules = {
         properties = { tag = tags[1]["con"], keys = conkeys, switchtotag = true,
         size_hints_honor = false, border_width = 0, floating = false } },
 
-    { rule = { class = "Gimp" },  properties = { tag = tags[1]["gimp"], switchtotag = true } },
+    { rule = { class = "Gimp" },  properties = { tag = tags[1]["gimp"] } },
     { rule = { instance = "gimp", type = "dialog" },  properties = { above = true } },
-    { rule = { role = "gimp-image-window" }, properties = { size_hints_honor = false, keys = gimp_box_keys,
-        border_width = 0, floating = false, maximized_vertical = true, maximized_horizontal = true } },
+    { rule = { role = "gimp-image-window" }, properties = { keys = gimp_box_keys,
+        border_width = 0, floating = false, } },
     { rule = { role = "gimp-toolbox" },  properties = { size_hints_honor = false,
-        floating = false, skip_taskbar = true, focus = false, keys = gimp_box_keys,
-        geometry = {x=0, y=19, height=581, width=400}, below = true } },
+        skip_taskbar = true, focus = false, keys = gimp_box_keys,
+        geometry = {x=0, y=19, height=562, width=400}, below = true } },
     { rule = { role = "gimp-dock" },  properties = { size_hints_honor = false,
-        floating = false, skip_taskbar = true, focus = false, keys = gimp_box_keys,
-        geometry = {x=624, y=19, height=581, width=400}, below = true } },
+        skip_taskbar = true, focus = false, keys = gimp_box_keys,
+        geometry = {x=624, y=19, height=562, width=400}, below = true } },
 
     { rule = { class = "Opera", instance = "opera" }, properties = { border_width = 0, floating = false } },
     { rule = { class = "Namoroka", role = "browser" }, properties = { border_width = 0, floating = false } },
@@ -455,6 +456,6 @@ imtimer:add_signal("timeout", function()
         end
     end
 end)
-imtimer:start()
+-- imtimer:start()
 
 rsi.run()
