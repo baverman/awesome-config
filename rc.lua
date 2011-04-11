@@ -179,8 +179,8 @@ globalkeys = awful.util.table.join(
     awful.key({"Control", "Mod1"}, "p",  function() spawn_or_raise("urxvtc -name ncmpcpp -e ncmpcpp",
         match_client{instance='ncmpcpp'}) end),
 
-    awful.key({modkey}, "i",  function() spawn_or_raise("urxvtc -name irssi -e irssi",
-        match_client{instance='irssi'}) end),
+    awful.key({modkey}, "i",  function() spawn_or_raise("urxvtc -name weechat -e weechat-curses",
+        match_client{instance='weechat'}) end),
 
     awful.key({"Control", "Mod1"}, "m",  function() spawn_or_raise("urxvtc -name amixer -e alsamixer",
         match_client{instance='amixer'}) end),
