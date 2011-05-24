@@ -8,6 +8,7 @@ require("vicious")
 require("bobroutils")
 require("tbar")
 require("rsi")
+require("rodentbane")
 --require("debug")
 
 -- {{{ Variable definitions
@@ -157,6 +158,8 @@ globalkeys = awful.util.table.join(
 
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit),
+
+    awful.key({ modkey,           }, "c", rodentbane.start),
 
     -- Prompt
     awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
@@ -345,6 +348,7 @@ awful.rules.rules = {
         geometry = {x=624, y=19, height=562, width=400}, below = true } },
 
     { rule = { class = "Opera", instance = "opera" }, properties = { border_width = 0, floating = false } },
+    { rule = { class = "luakit", instance = "luakit" }, properties = { border_width = 0, floating = false } },
     { rule = { class = "Namoroka", role = "browser" }, properties = { border_width = 0, floating = false } },
     { rule = { class = "Firefox", role = "browser" }, properties = { border_width = 0, floating = false } },
 
